@@ -1,0 +1,26 @@
+MixinCuddleMonkey{{stackName}}:
+  Type: "AWS::Events::Rule"
+  Properties:
+    Description: Preheater for the {{stackName}} API
+    ScheduleExpression: {{interval}}
+    State: ENABLED
+    Targets:
+      {{#each targets}}
+      - Id: {{.}}
+        Arn: {"Fn::GetAtt": [{{.}}, "Arn"]}
+        Input: '{"source": "cuddle-monkey"}'
+      {{/each}}
+
+{{#each targets}}
+MixinCM{{.}}Role:
+  DependsOn:
+    - MixinCuddleMonkey{{@root.stackName}}
+  Type: "AWS::Lambda::Permission"
+  Properties:
+    Action: "lambda:InvokeFunction"
+    FunctionName:
+      "Fn::GetAtt": [{{.}}, "Arn"]
+    Principal: events.amazonaws.com
+    SourceArn:
+      "Fn::GetAtt": [MixinCuddleMonkey{{@root.stackName}}, "Arn"]
+{{/each}}
