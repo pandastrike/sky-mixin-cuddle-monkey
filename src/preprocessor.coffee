@@ -21,7 +21,6 @@ process = (_AWS_, config) ->
 
   # Extract additional configuration from the main stack config.
   stackName = capitalize camelCase plainText config.environmentVariables.fullName
-  policyName = config.policyName + "-cuddle-monkey"
 
   # Identify every Lambda in the API to be a CloudWatch target.
   targets = []
@@ -31,8 +30,16 @@ process = (_AWS_, config) ->
       for methodName, method of resource.methods
         targets.push method.lambda.handler.name
 
+  # There can only be 5 targets per rule.  Split them up into groups so we can assign targets and permissions in the template.
+  targetGroups = {}
+  group = 0
+  while targets.length > 0
+    targetGroups[group] = targets: targets.splice 0, 5
+    group++
+
+
   # Output configuration to be used by the Cuddle Monkey template.
-  {interval, tags, stackName, policyName, targets}
+  {interval, tags, stackName, targetGroups}
 
 
 export default process

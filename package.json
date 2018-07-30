@@ -1,6 +1,6 @@
 {
   "name": "sky-mixin-cuddle-monkey",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An API Preheater for your Sky API - Keep your API company when it gets lonely.",
   "main": "build/npm/src/index.js",
   "files": [

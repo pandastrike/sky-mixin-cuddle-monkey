@@ -11,7 +11,7 @@ var _fairmont = require("fairmont");
 var process;
 
 process = function (_AWS_, config) {
-  var c, env, interval, method, methodName, policyName, ref, ref1, ref2, ref3, resource, resourceName, stackName, tags, targets;
+  var c, env, group, interval, method, methodName, ref, ref1, ref2, ref3, resource, resourceName, stackName, tags, targetGroups, targets;
   // Start by extracting out the Cuddle Monkey Mixin configuration:
   ({ env, tags = [] } = config);
   c = config.aws.environments[env].mixins["cuddle-monkey"];
@@ -29,7 +29,6 @@ process = function (_AWS_, config) {
   }
   // Extract additional configuration from the main stack config.
   stackName = (0, _fairmont.capitalize)((0, _fairmont.camelCase)((0, _fairmont.plainText)(config.environmentVariables.fullName)));
-  policyName = config.policyName + "-cuddle-monkey";
   // Identify every Lambda in the API to be a CloudWatch target.
   targets = [];
   ref1 = (ref = config.rootResource) != null ? ref.methods : void 0;
@@ -46,8 +45,17 @@ process = function (_AWS_, config) {
       targets.push(method.lambda.handler.name);
     }
   }
+  // There can only be 5 targets per rule.  Split them up into groups so we can assign targets and permissions in the template.
+  targetGroups = {};
+  group = 0;
+  while (targets.length > 0) {
+    targetGroups[group] = {
+      targets: targets.splice(0, 5)
+    };
+    group++;
+  }
   // Output configuration to be used by the Cuddle Monkey template.
-  return { interval, tags, stackName, policyName, targets };
+  return { interval, tags, stackName, targetGroups };
 };
 
 exports.default = process;
