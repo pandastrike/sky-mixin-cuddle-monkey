@@ -7,20 +7,19 @@ MixinCuddleMonkey{{@root.stackName}}{{@key}}:
     State: ENABLED
     Targets:
       {{#each targets}}
-      - Id: {{.}}
-        Arn: {"Fn::GetAtt": [{{.}}, "Arn"]}
+      - Id: {{id}}
+        Arn: {{arn}}
         Input: '{"source": "cuddle-monkey"}'
       {{/each}}
 
 {{#each targets}}
-MixinCM{{.}}Role:
+MixinCM{{id}}Role:
   DependsOn:
     - MixinCuddleMonkey{{@root.stackName}}{{@../key}}
   Type: "AWS::Lambda::Permission"
   Properties:
     Action: "lambda:InvokeFunction"
-    FunctionName:
-      "Fn::GetAtt": [{{.}}, "Arn"]
+    FunctionName: {{arn}}
     Principal: events.amazonaws.com
     SourceArn:
       "Fn::GetAtt": [MixinCuddleMonkey{{@root.stackName}}{{@../key}}, "Arn"]

@@ -34,7 +34,10 @@ process = function (_AWS_, config) {
   ref1 = (ref = config.rootResource) != null ? ref.methods : void 0;
   for (methodName in ref1) {
     method = ref1[methodName];
-    targets.push(method.lambda.handler.name);
+    targets.push({
+      id: method.lambda.handler.name,
+      arn: method.lambda.function.arn
+    });
   }
   ref2 = config.resources;
   for (resourceName in ref2) {
@@ -42,7 +45,10 @@ process = function (_AWS_, config) {
     ref3 = resource.methods;
     for (methodName in ref3) {
       method = ref3[methodName];
-      targets.push(method.lambda.handler.name);
+      targets.push({
+        id: method.lambda.handler.name,
+        arn: method.lambda.function.arn
+      });
     }
   }
   // There can only be 5 targets per rule.  Split them up into groups so we can assign targets and permissions in the template.

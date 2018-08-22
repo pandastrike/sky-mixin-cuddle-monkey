@@ -25,10 +25,14 @@ process = (_AWS_, config) ->
   # Identify every Lambda in the API to be a CloudWatch target.
   targets = []
   for methodName, method of config.rootResource?.methods
-    targets.push method.lambda.handler.name
+    targets.push
+      id: method.lambda.handler.name
+      arn: method.lambda.function.arn
   for resourceName, resource of config.resources
       for methodName, method of resource.methods
-        targets.push method.lambda.handler.name
+        targets.push
+          id: method.lambda.handler.name
+          arn: method.lambda.function.arn
 
   # There can only be 5 targets per rule.  Split them up into groups so we can assign targets and permissions in the template.
   targetGroups = {}
